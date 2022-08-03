@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <iostream>
 
-//#include "Graph.h"
+#include "Graph.h"
 
 uint32_t GetNanos();
 
@@ -13,7 +13,7 @@ void PrintArray(int arr[], int arraySize);
 
 int main()
 {
-	const int ARRAY_SIZE = 10;
+	/*const int ARRAY_SIZE = 10;
 	uint32_t start = 0, end = 0;
 
 	int arr[ARRAY_SIZE] = { 0 };
@@ -26,10 +26,27 @@ int main()
 	printf("\n");
 	printf("BubbleSort took: %i nanoseconds", (end - start));
 	printf("\n");
-	PrintArray(arr, ARRAY_SIZE);
+	PrintArray(arr, ARRAY_SIZE);*/
 
-	/*Node* nodeTest = new Node("Start");
-	std::cout << nodeTest;*/
+	Node* firstNode = new Node("Start");
+	Node* secondNode = new Node("Hello");
+	Node* thirdNode = new Node("World");
+	Node* fourthNode = new Node("Wow");
+
+	Graph* graph = new Graph();
+	graph->InsertNode(*firstNode);
+	graph->InsertNode(*secondNode);
+	graph->InsertNode(*thirdNode);
+	graph->InsertNode(*fourthNode);
+
+	graph->InsertEdge(*firstNode, *secondNode, 10);
+	graph->InsertEdge(*firstNode, *thirdNode, 7);
+	graph->InsertEdge(*firstNode, *fourthNode, 32);
+	std::cout << "Print Graph" << std::endl;
+	graph->PrintNodesInGraph();
+
+	std::cout << std::endl;
+	firstNode->PrintAdjacencyList();
 }
 
 uint32_t GetNanos()
