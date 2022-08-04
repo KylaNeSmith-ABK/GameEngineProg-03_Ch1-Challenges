@@ -1,27 +1,28 @@
+#include <vector>
+#include <queue>
+#include <set>
+#include <stack>
+
 #include "Graph.h"
 
-void Graph::UnvisitNodes()
+static void PrintVector(std::vector<Node*> nodeVec)
 {
-	for (std::pair<std::string, Node*> node : Nodes_)
+	int counter = 0, vecSize = nodeVec.size();
+	for (Node* node : nodeVec)
 	{
-		node.second->Unvisit();
+		std::cout << *node;
+		counter++;
+		if (counter < vecSize)
+		{
+			std::cout << " --> ";
+		}
 	}
-
-}
-
-Node* Graph::FindNode(const std::string& nodeLabel) const
-{
-	if (Nodes_.count(nodeLabel) > 0)
-	{
-		return Nodes_.at(nodeLabel);
-	}
-
-	return nullptr;
+	std::cout << std::endl;
 }
 
 Graph::Graph()
-	: NumberOfNodes_(0)
-	, NumberOfEdges_(0)
+	: NodeCount_(0)
+	, EdgeCount_(0)
 {
 	Nodes_.clear();
 }
@@ -36,19 +37,31 @@ Graph::~Graph()
 	Nodes_.clear();
 }
 
-void Graph::InsertNode(Node& node)
+Node* Graph::FindNode(const std::string& nodeLabel) const
+{
+	if (Nodes_.count(nodeLabel) > 0)
+	{
+		return Nodes_.at(nodeLabel);
+	}
+
+	return nullptr;
+}
+
+void Graph::AddNode(Node& node)
 {
 	if (FindNode(node.GetLabel()) == nullptr)
 	{
 		Nodes_[node.GetLabel()] = &node;
+		NodeCount_++;
 	}
 }
 
-void Graph::InsertNode(const std::string& nodeLabel)
+void Graph::AddNode(const std::string& nodeLabel)
 {
 	if (FindNode(nodeLabel) == nullptr)
 	{
 		Nodes_[nodeLabel] = new Node(nodeLabel);
+		NodeCount_++;
 	}
 }
 
@@ -63,28 +76,203 @@ bool Graph::InsertEdge(const std::string& startLabel, const std::string& endLabe
 	Node* endNodePtr = FindNode(endLabel);
 	if ((startNodePtr != nullptr) && (endNodePtr != nullptr))
 	{
-		return startNodePtr->Connect(endNodePtr, edgeWeight);
+		startNodePtr->Connect(endNodePtr, edgeWeight);
 
 		if (twoWay)
 		{
 			endNodePtr->Connect(startNodePtr, edgeWeight);
+			EdgeCount_++;
 		}
 
+		EdgeCount_++;
 		return true;
 	}
 	return false;
 }
 
-int Graph::GetEdgeWeight(std::string& startLabel, std::string& endLabel) const
+int Graph::GetEdgeWeightBetween(const std::string& startLabel, const std::string& endLabel) const
 {
 	Node* startNodePtr = FindNode(startLabel);
 	Node* endNodePtr = FindNode(endLabel);
-	if ((startNodePtr == nullptr) || (endNodePtr == nullptr) || (startNodePtr->GetEdgeWeightTo(endNodePtr) < 0))
+	if ((startNodePtr == nullptr) || (endNodePtr == nullptr) || !startNodePtr->IsConnectedTo(endNodePtr))
 	{
 		return INT_MAX;
 	}
 
-	return (startNodePtr->GetEdgeWeightTo(endNodePtr));
+	int i = (startNodePtr->GetEdgeWeightTo(endNodePtr));
+
+	return i;
+}
+
+bool Graph::SetEdgeWeightBetween(const std::string& startLabel, const std::string& endLabel, int edgeWeight)
+{
+	Node* startNodePtr = FindNode(startLabel);
+	Node* endNodePtr = FindNode(endLabel);
+
+	return ((startNodePtr != nullptr) && (endNodePtr != nullptr) && (startNodePtr->SetEdgeWeightTo(endNodePtr, edgeWeight)));
+}
+
+void Graph::UnvisitNodes()
+{
+	for (std::pair<std::string, Node*> node : Nodes_)
+	{
+		node.second->Unvisit();
+	}
+}
+
+bool Graph::DepthFirstSearch(const std::string& startLabel, const std::string& endLabel)
+{
+	UnvisitNodes();
+
+	bool bFound = false;
+
+	Node* startNodePtr = FindNode(startLabel);
+	Node* endNodePtr = FindNode(endLabel);
+
+	if ((startNodePtr == nullptr) || (endNodePtr == nullptr) || (startNodePtr->IsThisNode(endNodePtr)))
+	{
+		return bFound;
+	}
+
+	std::stack<Node*> nodeStack;
+	std::vector<Node*> visitedNodes;
+
+	nodeStack.push(startNodePtr);
+	
+	while (!nodeStack.empty() && !bFound)
+	{
+		Node* currentNodePtr = nodeStack.top();
+		nodeStack.pop();
+
+		if (currentNodePtr->IsVisited())
+		{
+			continue;
+		}
+
+		currentNodePtr->Visit();
+		visitedNodes.push_back(currentNodePtr);
+
+		std::map<int, std::vector<Edge*>> adjMap = currentNodePtr->GetAdjacencyList();
+		std::map<int, std::vector<Edge*>>::reverse_iterator rIter;
+		for (rIter = adjMap.rbegin(); rIter != adjMap.rend(); rIter++)
+		{
+			if (bFound)
+			{
+				break;
+			}
+
+			for (Edge* edge : (*rIter).second)
+			{
+				Node* adjNodePtr = edge->GetEndNode();
+				if ((adjNodePtr != nullptr) && (!adjNodePtr->IsVisited()))
+				{
+					if (adjNodePtr == endNodePtr)
+					{
+						visitedNodes.push_back(adjNodePtr);
+						bFound = true;
+						break;
+					}
+					nodeStack.push(adjNodePtr);
+				}
+			}
+		}
+
+		/*for (std::pair<int, std::vector<Edge*>> pair : currentNodePtr->GetAdjacencyList())
+		{
+			for (Edge* edge : pair.second)
+			{
+				Node* adjNodePtr = edge->GetEndNode();
+				if ((adjNodePtr != nullptr) && (!adjNodePtr->IsVisited()))
+				{
+					nodeStack.push(adjNodePtr);
+				}
+			}
+		}*/
+	}
+
+	PrintVector(visitedNodes);
+	return bFound;
+}
+
+bool Graph::BreadthFirstSearch(const std::string& startLabel, const std::string& endLabel)
+{
+	UnvisitNodes();
+
+	bool bFound = false;
+
+	Node* startNodePtr = FindNode(startLabel);
+	Node* endNodePtr = FindNode(endLabel);
+
+	if ((startNodePtr == nullptr) || (endNodePtr == nullptr))
+	{
+		return bFound;
+	}
+
+	std::queue<Node*> nodeQueue;
+	std::vector<Node*> visitedNodes;
+
+	nodeQueue.push(startNodePtr);
+
+	while (!nodeQueue.empty())
+	{
+		Node* currentNodePtr = nodeQueue.front();
+		nodeQueue.pop();
+
+		if (currentNodePtr->IsVisited())
+		{
+			continue;
+		}
+
+		currentNodePtr->Visit();
+		visitedNodes.push_back(currentNodePtr);
+
+		if (currentNodePtr == endNodePtr)
+		{
+			bFound = true;
+			break;
+		}
+
+		/*for (std::pair<std::string, Edge> edge : currentNodePtr->GetAdjacencyList())
+		{
+			Node* adjNodePtr = edge.second.GetEndNode();
+			if (!adjNodePtr->IsVisited())
+			{
+				nodeQueue.push(adjNodePtr);
+			}
+		}*/
+	}
+
+	PrintVector(visitedNodes);
+	return bFound;
+}
+
+bool Graph::DijkstraSearch(const std::string& startLabel, const std::string& endLabel)
+{
+	UnvisitNodes();
+
+	bool bFound = false;
+
+	Node* startNodePtr = FindNode(startLabel);
+	Node* endNodePtr = FindNode(endLabel);
+
+	if ((startNodePtr == nullptr) || (endNodePtr == nullptr))
+	{
+		return bFound;
+	}
+
+	std::queue<Node*> nodeQueue;
+
+	nodeQueue.push(startNodePtr);
+	startNodePtr->SetDistanceFromStart(0);
+
+	while (!nodeQueue.empty())
+	{
+		Node* currentNode = nullptr;
+
+
+	}
+
+	return bFound;
 }
 
 void Graph::PrintNodesInGraph() const

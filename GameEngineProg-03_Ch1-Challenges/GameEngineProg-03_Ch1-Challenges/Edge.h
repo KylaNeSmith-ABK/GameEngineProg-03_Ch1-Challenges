@@ -23,4 +23,6 @@ public:
 	Node* GetEndNode() const { return EndNode_; }
 
 	int GetWeight() const { return EdgeWeight_; }
+
+	void SetWeight(int edgeWeight) { EdgeWeight_ = edgeWeight; }
 };

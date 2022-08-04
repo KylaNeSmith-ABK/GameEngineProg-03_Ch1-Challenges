@@ -2,88 +2,86 @@
 #include <stdlib.h>
 #include <iostream>
 
+#include "Utils.h"
 #include "Graph.h"
+#include "CheatDijkstra.h"
 
-uint32_t GetNanos();
-
-void BubbleSort(int arr[], int arraySize);
-
-void FillArray(int arr[], int arraySize = 10, int maxRandValue = 100);
-void PrintArray(int arr[], int arraySize);
+void BubbleSortTest();
 
 int main()
 {
-	/*const int ARRAY_SIZE = 10;
+	//Node* nodeA = new Node("A");
+	//Node* nodeB = new Node("B");
+	//Node* nodeC = new Node("C");
+	//Node* nodeD = new Node("D");
+	//Node* nodeE = new Node("E");
+	//Node* nodeF = new Node("F");
+	//Node* nodeG = new Node("G");
+	//Node* nodeH = new Node("H");
+	//Node* nodeI = new Node("I");
+	//Node* nodeJ = new Node("J");
+	//Node* nodeK = new Node("K");
+
+	//Graph* graphTest = new Graph();
+	//graphTest->AddNode(*nodeA);
+	//graphTest->AddNode(*nodeB);
+	//graphTest->AddNode(*nodeC);
+	//graphTest->AddNode(*nodeD);
+	//graphTest->AddNode(*nodeE);
+	//graphTest->AddNode(*nodeF);
+	//graphTest->AddNode(*nodeG);
+	//graphTest->AddNode(*nodeH);
+	//graphTest->AddNode(*nodeI);
+	//graphTest->AddNode(*nodeJ);
+	//graphTest->AddNode(*nodeK);
+
+	//graphTest->PrintNodesInGraph();
+
+	//graphTest->InsertEdge("A", "B", 5);
+	//graphTest->InsertEdge("B", "C", 1);
+	//graphTest->InsertEdge("A", "D", 7);
+	//graphTest->InsertEdge("C", "D", 1);
+	//graphTest->InsertEdge("A", "K", 2);
+	//graphTest->InsertEdge("B", "G", 3);
+	//graphTest->InsertEdge("A", "I", 10);
+	//graphTest->InsertEdge("C", "H", 2);
+
+	//std::cout << std::endl;
+	//nodeA->PrintAdjacencyList();
+
+	//std::cout << std::endl;
+	//std::cout << "A -> I: " << graphTest->GetEdgeWeightBetween("A", "I") << std::endl;
+
+	//std::cout << std::endl;
+
+	//graphTest->DepthFirstSearch("A", "G");
+	////graphTest->BreadthFirstSearch("A", "G");
+
+	//delete graphTest;
+
+	const int GRAPH_SIZE = 4;
+	int graph[GRAPH_SIZE][GRAPH_SIZE] = { {0,5,0,7},
+											{5,0,1,0},
+											{0,1,0,1},
+											{7,0,1,0} };
+	CheatDijkstra::Dijkstra(graph, GRAPH_SIZE, 3);
+}
+
+void BubbleSortTest()
+{
+	const int ARRAY_SIZE = 10;
 	uint32_t start = 0, end = 0;
 
 	int arr[ARRAY_SIZE] = { 0 };
-	FillArray(arr, ARRAY_SIZE);
+	Utils::FillArray(arr, ARRAY_SIZE);
 
-	PrintArray(arr, ARRAY_SIZE);
-	start = GetNanos();
-	BubbleSort(arr, ARRAY_SIZE);
-	end = GetNanos();
-	printf("\n");
-	printf("BubbleSort took: %i nanoseconds", (end - start));
-	printf("\n");
-	PrintArray(arr, ARRAY_SIZE);*/
+	printf("Unsorted Array: ");
+	Utils::PrintArray(arr, ARRAY_SIZE);
+	start = Utils::GetNanos();
+	Utils::BubbleSort(arr, ARRAY_SIZE);
+	end = Utils::GetNanos();
 
-	Node* firstNode = new Node("Start");
-	Node* secondNode = new Node("Hello");
-	Node* thirdNode = new Node("World");
-	Node* fourthNode = new Node("Wow");
-
-	Graph* graph = new Graph();
-	graph->InsertNode(*firstNode);
-	graph->InsertNode(*secondNode);
-	graph->InsertNode(*thirdNode);
-	graph->InsertNode(*fourthNode);
-
-	graph->InsertEdge(*firstNode, *secondNode, 10);
-	graph->InsertEdge(*firstNode, *thirdNode, 7);
-	graph->InsertEdge(*firstNode, *fourthNode, 32);
-	std::cout << "Print Graph" << std::endl;
-	graph->PrintNodesInGraph();
-
-	std::cout << std::endl;
-	firstNode->PrintAdjacencyList();
-}
-
-uint32_t GetNanos()
-{
-	return static_cast<uint32_t>(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
-}
-
-void BubbleSort(int arr[], int arraySize)
-{
-	for (int index_1 = 0; index_1 < arraySize - 1; index_1++)
-	{
-		for (int index_2 = 0; index_2 < arraySize - 2; index_2++)
-		{
-			if (arr[index_2] > arr[index_2 + 1])
-			{
-				int temp = arr[index_2];
-
-				arr[index_2] = arr[index_2 + 1];
-
-				arr[index_2 + 1] = temp;
-			}
-		}
-	}
-}
-
-void FillArray(int arr[], int arraySize, int maxRandValue)
-{
-	for (int index = 0; index < arraySize - 1; index++)
-	{
-		arr[index] = rand() % maxRandValue + 1;
-	}
-}
-
-void PrintArray(int arr[], int arraySize)
-{
-	for (int index = 0; index < arraySize - 1; index++)
-	{
-		printf("%i ", arr[index]);
-	}
+	printf("\n\nSorted Array:   ");
+	Utils::PrintArray(arr, ARRAY_SIZE);
+	printf("\nBubbleSort took: %i nanoseconds\n", (end - start));
 }
