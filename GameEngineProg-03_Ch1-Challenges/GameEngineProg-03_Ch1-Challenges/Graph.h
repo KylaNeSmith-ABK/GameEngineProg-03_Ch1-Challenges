@@ -57,4 +57,6 @@ public:
 	bool DijkstraSearch(const std::string& startLabel, const std::string& endLabel);
 
 	void PrintNodesInGraph() const;
+
+	void PrintAdjacencyLists() const;
 };

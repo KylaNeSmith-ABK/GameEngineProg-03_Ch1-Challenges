@@ -152,6 +152,12 @@ bool Graph::DepthFirstSearch(const std::string& startLabel, const std::string& e
 		currentNodePtr->Visit();
 		visitedNodes.push_back(currentNodePtr);
 
+		if (currentNodePtr == endNodePtr)
+		{
+			bFound = true;
+			break;
+		}
+
 		std::map<int, std::vector<Edge*>> adjMap = currentNodePtr->GetAdjacencyList();
 		std::map<int, std::vector<Edge*>>::reverse_iterator rIter;
 		for (rIter = adjMap.rbegin(); rIter != adjMap.rend(); rIter++)
@@ -166,30 +172,13 @@ bool Graph::DepthFirstSearch(const std::string& startLabel, const std::string& e
 				Node* adjNodePtr = edge->GetEndNode();
 				if ((adjNodePtr != nullptr) && (!adjNodePtr->IsVisited()))
 				{
-					if (adjNodePtr == endNodePtr)
-					{
-						visitedNodes.push_back(adjNodePtr);
-						bFound = true;
-						break;
-					}
 					nodeStack.push(adjNodePtr);
 				}
 			}
 		}
-
-		/*for (std::pair<int, std::vector<Edge*>> pair : currentNodePtr->GetAdjacencyList())
-		{
-			for (Edge* edge : pair.second)
-			{
-				Node* adjNodePtr = edge->GetEndNode();
-				if ((adjNodePtr != nullptr) && (!adjNodePtr->IsVisited()))
-				{
-					nodeStack.push(adjNodePtr);
-				}
-			}
-		}*/
 	}
 
+	std::cout << "Depth First Search from " << startLabel << " to " << endLabel << "\nNodes visited ";
 	PrintVector(visitedNodes);
 	return bFound;
 }
@@ -213,7 +202,7 @@ bool Graph::BreadthFirstSearch(const std::string& startLabel, const std::string&
 
 	nodeQueue.push(startNodePtr);
 
-	while (!nodeQueue.empty())
+	while (!nodeQueue.empty() && !bFound)
 	{
 		Node* currentNodePtr = nodeQueue.front();
 		nodeQueue.pop();
@@ -232,16 +221,28 @@ bool Graph::BreadthFirstSearch(const std::string& startLabel, const std::string&
 			break;
 		}
 
-		/*for (std::pair<std::string, Edge> edge : currentNodePtr->GetAdjacencyList())
+		std::map<int, std::vector<Edge*>> adjMap = currentNodePtr->GetAdjacencyList();
+		std::map<int, std::vector<Edge*>>::iterator iter;
+		for (iter = adjMap.begin(); iter != adjMap.end(); iter++)
 		{
-			Node* adjNodePtr = edge.second.GetEndNode();
-			if (!adjNodePtr->IsVisited())
+			if (bFound)
 			{
-				nodeQueue.push(adjNodePtr);
+				break;
 			}
-		}*/
+
+			for (Edge* edge : (*iter).second)
+			{
+				Node* adjNodePtr = edge->GetEndNode();
+				if ((adjNodePtr != nullptr) && (!adjNodePtr->IsVisited()))
+				{
+					
+					nodeQueue.push(adjNodePtr);
+				}
+			}
+		}
 	}
 
+	std::cout << "Breadth First Search from " << startLabel << " to " << endLabel << "\nNodes visited ";
 	PrintVector(visitedNodes);
 	return bFound;
 }
@@ -280,5 +281,14 @@ void Graph::PrintNodesInGraph() const
 	for (std::pair<std::string, Node*> node : Nodes_)
 	{
 		std::cout << *node.second << std::endl;
+	}
+}
+
+void Graph::PrintAdjacencyLists() const
+{
+	for (std::pair<std::string, Node*> node : Nodes_)
+	{
+		node.second->PrintAdjacencyList();
+		std::cout << std::endl;
 	}
 }
