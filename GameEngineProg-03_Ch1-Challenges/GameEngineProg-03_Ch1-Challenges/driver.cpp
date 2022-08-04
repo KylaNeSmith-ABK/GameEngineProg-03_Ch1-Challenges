@@ -7,9 +7,14 @@
 #include "CheatDijkstra.h"
 
 void BubbleSortTest();
+void CheatDijkstraTest();
 
 int main()
 {
+	BubbleSortTest();
+	std::cout << std::endl;
+	CheatDijkstraTest();
+
 	//Node* nodeA = new Node("A");
 	//Node* nodeB = new Node("B");
 	//Node* nodeC = new Node("C");
@@ -59,12 +64,6 @@ int main()
 
 	//delete graphTest;
 
-	const int GRAPH_SIZE = 4;
-	int graph[GRAPH_SIZE][GRAPH_SIZE] = { {0,5,0,7},
-											{5,0,1,0},
-											{0,1,0,1},
-											{7,0,1,0} };
-	CheatDijkstra::Dijkstra(graph, GRAPH_SIZE, 3);
 }
 
 void BubbleSortTest()
@@ -84,4 +83,14 @@ void BubbleSortTest()
 	printf("\n\nSorted Array:   ");
 	Utils::PrintArray(arr, ARRAY_SIZE);
 	printf("\nBubbleSort took: %i nanoseconds\n", (end - start));
+}
+
+void CheatDijkstraTest()
+{
+	const int GRAPH_SIZE = 4;
+	int graph[GRAPH_SIZE][GRAPH_SIZE] = { {0,5,0,7},
+											{5,0,1,0},
+											{0,1,0,1},
+											{7,0,1,0} };
+	CheatDijkstra::Dijkstra(graph, GRAPH_SIZE, 3);
 }
